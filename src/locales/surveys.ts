@@ -1,0 +1,42 @@
+export const Surveys = {
+  dashboard: {
+    title: "Dashboard",
+    totalSurveys: "Total Surveys",
+    totalResponses: "Total Responses",
+    totalUsers: "Total Users",
+    dateFilter: {
+      title: "Filter by Date",
+      applyFilter: "Apply Filter",
+      presets: {
+        last7Days: "Last 7 Days",
+        last30Days: "Last 30 Days",
+        thisMonth: "This Month",
+        lastMonth: "Last Month",
+        thisYear: "This Year",
+        custom: "Custom Range",
+      },
+    },
+    surveyChartTitle: "Survey & Response Trends",
+    loading: "Loading analytics data...",
+    error: "Failed to load analytics data",
+    retry: "Retry",
+  },
+  addSurvey: {
+    title: "Create New Survey",
+    textFieldLabel: "Text Field",
+    numberFieldLabel: "Number Field",
+    checkboxFieldLabel: "Checkbox Field",
+    selectFieldLabel: "Select Field",
+    radioFieldLabel: "Radio Field",
+    submitButton: "Submit Survey",
+    noSurveyText: "Add fields to enable submission",
+  },
+  surveyList: {
+    title: "Surveys",
+    surveyButton: "Take Survey",
+    deleteTitle: "Delete Survey",
+    deleteSubtitle: "Are you sure you want to delete this survey?",
+    cancelButton: "Cancel",
+    deleteButton: "Delete",
+  },
+};

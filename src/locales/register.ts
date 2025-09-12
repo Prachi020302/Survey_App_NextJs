@@ -1,0 +1,25 @@
+export const Register = {
+  title: "Register to your account",
+  firstName: "First Name",
+  lastName: "Last Name",
+  emailLabel: "Email",
+  role: "Role",
+  passwordLabel: "Password",
+  registerButton: "Register",
+  haveAccount: "Already have an account?",
+  login: "Login",
+  placeholder: {
+    firstName: "Enter your first name",
+    lastName: "Enter your last name",
+    email: "Enter your email",
+    password: "Enter your password",
+  },
+  validationMessage: {
+    firstNameRequired: "First name is required",
+    lastNameRequired: "Last name is required",
+    emailRequired: "Email is required",
+    emailInvalid: "Invalid email format",
+    passwordRequired: "Password is required",
+    passwordMinLength: "Password must be at least 6 characters long",
+  },
+};
