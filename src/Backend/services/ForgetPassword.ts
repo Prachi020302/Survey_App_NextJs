@@ -1,28 +1,29 @@
 import { User_Data } from "../model/UserModel";
+import { responseStatusCode } from "../utils/responseHandler";
+import translations from "../utils/translate";
+import crypto from "crypto";
 
 const forgetPassword = async (email: string) => {
-  // Logic for forgetting password
-  // 1. Validate email
-  // 2. Generate reset token
-  // 3. Send email with reset link
-
-  // Implementation here
   try {
-    // 1. Validate email
     const user = await User_Data.findOne({ email });
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      throw new Error(translations.userNotFound);
+    }
 
-    // 2. Generate reset token
-    const resetToken = user.generateResetToken();
-
-    // 3. Send email with reset link
-    await sendEmail({
-      to: email,
-      subject: "Password Reset",
-      text: `Reset your password using this link: ${resetToken}`,
-    });
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+    return {
+      statusCode: 200,
+      resetToken: token,
+    };
   } catch (error) {
-    console.error("Error in forgetPassword:", error);
+    const typeError = error as Error;
+    return {
+      statusCode: responseStatusCode.internal,
+      message: typeError.message || translations.internalError,
+    };
   }
 };
 

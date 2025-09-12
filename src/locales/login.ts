@@ -15,4 +15,12 @@ export const Login = {
   },
   notHaveAccount: "Don’t have an account?",
   registerNow: "Register now",
+  forgetPassword: {
+    title: "Forget Password",
+    generateToken: "Generate Token",
+    copyText: "Copy this token and proceed to reset password:",
+    copyToken: "Copy Token",
+    copied: "Copied!",
+    resetButton: "Go to Reset Password",
+  },
 };

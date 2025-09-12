@@ -18,6 +18,7 @@ interface AuthState {
   login: { id: string; email: string; role: string };
   isLoading: boolean;
   error: { statusCode: string; message: string } | null;
+  token: string;
 }
 
 const initialState: AuthState = {
@@ -25,6 +26,7 @@ const initialState: AuthState = {
   login: { id: "", email: "", role: "" },
   isLoading: false,
   error: null,
+  token: "",
 };
 
 // register thunk using axios
@@ -58,7 +60,9 @@ export const loginUser = createAsyncThunk<
         withCredentials: true,
       }
     );
-    return { data: { id: res.data.id, email: res.data.email, role: res.data.role } };
+    return {
+      data: { id: res.data.id, email: res.data.email, role: res.data.role },
+    };
   } catch (err) {
     const error = err as { statusCode: string; message: string };
     return rejectWithValue({
@@ -85,6 +89,42 @@ export const getUser = createAsyncThunk<
   }
 });
 
+export const generateResetToken = createAsyncThunk<
+  { token: string },
+  { email: string },
+  { rejectValue: { statusCode: string; message: string } }
+>("auth/generateResetToken", async (payload, { rejectWithValue }) => {
+  try {
+    const res = await axios.post<{ token: string }>(
+      "/api/forget-password",
+      payload
+    );
+    return { token: res.data.token };
+  } catch (err) {
+    const error = err as { statusCode: string; message: string };
+    return rejectWithValue({
+      statusCode: error.statusCode,
+      message: error.message,
+    });
+  }
+});
+
+export const resetPassword = createAsyncThunk<
+  void,
+  { token: string; password: string },
+  { rejectValue: { statusCode: string; message: string } }
+>("auth/resetPassword", async (payload, { rejectWithValue }) => {
+  try {
+    await axios.post("/api/reset-password", payload);
+  } catch (err) {
+    const error = err as { statusCode: string; message: string };
+    return rejectWithValue({
+      statusCode: error.statusCode,
+      message: error.message,
+    });
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -102,72 +142,115 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.error = null;
     },
+    resetToken: (state) => {
+      state.token = initialState.token;
+    },
   },
   extraReducers: (builder) => {
     // register
-    builder.addCase(registerUser.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(registerUser.fulfilled, (state, action) => {
-      state.register = action.meta.arg;
-      state.isLoading = false;
-      state.error = null;
-    });
-    builder.addCase(registerUser.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = {
-        statusCode: action.payload?.statusCode || "500",
-        message: action.payload?.message || "Registration failed",
-      };
-    });
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.register = action.meta.arg;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = {
+          statusCode: action.payload?.statusCode || "500",
+          message: action.payload?.message || "Registration failed",
+        };
+      });
 
     // login
-    builder.addCase(loginUser.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(loginUser.fulfilled, (state, action) => {
-      state.login = {
-        id: action.payload.data.id,
-        email: action.payload.data.email,
-        role: action.payload.data.role,
-      };
-      state.isLoading = false;
-      state.error = null;
-    });
-    builder.addCase(loginUser.rejected, (state, action) => {
-      state.isLoading = false;
-      if (action.payload) {
-        state.error = {
-          statusCode: action.payload.statusCode || "500",
-          message: action.payload.message || "Login failed",
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.login = {
+          id: action.payload.data.id,
+          email: action.payload.data.email,
+          role: action.payload.data.role,
         };
-      } else {
-        state.error = {
-          statusCode: "500",
-          message: "Login failed",
-        };
-      }
-    });
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        if (action.payload) {
+          state.error = {
+            statusCode: action.payload.statusCode || "500",
+            message: action.payload.message || "Login failed",
+          };
+        } else {
+          state.error = {
+            statusCode: "500",
+            message: "Login failed",
+          };
+        }
+      });
 
     // getUser
-    builder.addCase(getUser.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(getUser.fulfilled, (state, action) => {
-      state.login = action.payload;
-      state.isLoading = false;
-      state.error = null;
-    });
-    builder.addCase(getUser.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = {
-        statusCode: action.payload?.statusCode || "500",
-        message: action.payload?.message || "Fetching user failed",
-      };
-    });
+    builder
+      .addCase(getUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getUser.fulfilled, (state, action) => {
+        state.login = action.payload;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(getUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = {
+          statusCode: action.payload?.statusCode || "500",
+          message: action.payload?.message || "Fetching user failed",
+        };
+      });
+
+    // generateResetToken
+    builder
+      .addCase(generateResetToken.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(generateResetToken.fulfilled, (state, action) => {
+        state.token = action.payload.token;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(generateResetToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = {
+          statusCode: action.payload?.statusCode || "500",
+          message: action.payload?.message || "Generating reset token failed",
+        };
+      });
+
+    // resetPassword
+    builder
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = {
+          statusCode: action.payload?.statusCode || "500",
+          message: action.payload?.message || "Resetting password failed",
+        };
+      });
   },
 });
 

@@ -22,3 +22,6 @@ export const AuthLoading = createSelector(
 
 // error
 export const AuthError = createSelector([AuthState], (auth) => auth.error);
+
+// token
+export const AuthToken = createSelector([AuthState], (auth) => auth.token);

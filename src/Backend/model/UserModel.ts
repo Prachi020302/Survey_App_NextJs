@@ -9,6 +9,8 @@ interface UserInterface {
   role: string;
   password: string;
   otp: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const UserSchema = new mongoose.Schema<UserInterface>(
@@ -54,6 +56,8 @@ const UserSchema = new mongoose.Schema<UserInterface>(
     otp: {
       type: String,
     },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
   },
   { timestamps: true }
 );
