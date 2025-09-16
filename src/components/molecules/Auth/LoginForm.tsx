@@ -115,7 +115,9 @@ const LoginForm = () => {
             }}
           />
           <Typography variant="body2" sx={{ mt: 2 }}>
-            <Link href="/forget-password">Forget Password?</Link>
+            <Link href="/forget-password">
+              {Login.forgetPassword.title}?
+            </Link>
           </Typography>
           <Button
             data-testid="login-button"

@@ -23,4 +23,17 @@ export const Login = {
     copied: "Copied!",
     resetButton: "Go to Reset Password",
   },
+  resetPassword: {
+    title: "Reset Password",
+    tokenLabel: "Token",
+    newPasswordLabel: "New Password",
+    confirmPasswordLabel: "Confirm Password",
+    validationMessage: {
+      tokenRequired: "Token is required",
+      passwordRequired: "Password is required",
+      confirmPasswordRequired: "Confirm Password is required",
+      passwordMinLength: "Password must be at least 6 characters long",
+      passwordsMustMatch: "Passwords must match",
+    },
+  },
 };

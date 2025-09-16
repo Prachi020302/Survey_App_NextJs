@@ -3,7 +3,7 @@ import { responseStatusCode } from "../utils/responseHandler";
 import translations from "../utils/translate";
 import crypto from "crypto";
 
-const forgetPassword = async (email: string) => {
+const ForgetPasswordService = async (email: string) => {
   try {
     const user = await User_Data.findOne({ email });
     if (!user) {
@@ -27,4 +27,4 @@ const forgetPassword = async (email: string) => {
   }
 };
 
-export default forgetPassword;
+export default ForgetPasswordService;

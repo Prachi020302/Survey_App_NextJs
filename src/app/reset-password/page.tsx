@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup/dist/yup.js";
 import { dispatch } from "../redux/store";
 import { authActions, resetPassword } from "../redux/slices/authSlice";
 import { toast } from "react-toastify";
+import { Login } from "@/locales/login";
 import * as Yup from "yup";
 
 interface ResetPasswordFormValues {
@@ -22,11 +23,18 @@ const ResetPasswordPage = () => {
   const router = useRouter();
 
   const validateSchema = Yup.object().shape({
-    token: Yup.string().required("Token is required"),
-    password: Yup.string().required("Password is required"),
+    token: Yup.string().required(
+      Login.resetPassword.validationMessage.tokenRequired
+    ),
+    password: Yup.string()
+      .required(Login.resetPassword.validationMessage.passwordRequired)
+      .min(6, Login.resetPassword.validationMessage.passwordMinLength),
     confirmPassword: Yup.string()
-      .required("Confirm Password is required")
-      .oneOf([Yup.ref("password")], "Passwords must match"),
+      .required(Login.resetPassword.validationMessage.confirmPasswordRequired)
+      .oneOf(
+        [Yup.ref("password")],
+        Login.resetPassword.validationMessage.passwordsMustMatch
+      ),
   });
 
   const methods = useForm({
@@ -59,7 +67,7 @@ const ResetPasswordPage = () => {
   return (
     <Layouts>
       <Box sx={{ mt: 8, textAlign: "center" }}>
-        <Typography variant="h5">Reset Password</Typography>
+        <Typography variant="h5">{Login.resetPassword.title}</Typography>
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <Box
             sx={{
@@ -71,23 +79,23 @@ const ResetPasswordPage = () => {
             }}
           >
             <RHFTextField
-              label="Token"
+              label={Login.resetPassword.tokenLabel}
               {...methods.register("token", { required: true })}
               sx={{ mt: 2 }}
             />
             <RHFTextField
-              label="New Password"
+              label={Login.resetPassword.newPasswordLabel}
               type="password"
               {...methods.register("password", { required: true })}
               sx={{ mt: 2 }}
             />
             <RHFTextField
-              label="Confirm Password"
+              label={Login.resetPassword.confirmPasswordLabel}
               {...methods.register("confirmPassword", { required: true })}
               sx={{ mt: 2 }}
             />
             <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-              Reset Password
+              {Login.resetPassword.title}
             </Button>
           </Box>
         </FormProvider>

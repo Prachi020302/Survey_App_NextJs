@@ -1,38 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/Backend/config/dataBase";
-import { User_Data } from "@/Backend/model/UserModel";
-import bcrypt from "bcryptjs";
+import { responseStatusCode } from "@/Backend/utils/responseHandler";
+import translations from "@/Backend/utils/translate";
+import ResetPassword from "@/Backend/services/ResetPassword";
 
 export const POST = async (req: NextRequest) => {
-  await connectDB();
-  const { token, password } = await req.json();
+  try {
+    await connectDB();
+    const { token, password } = await req.json();
 
-  if (!token || !password) {
+    const result = await ResetPassword(token, password);
+    return NextResponse.json({
+      message: result.message,
+      status: result.statusCode,
+    });
+  } catch (error) {
+    const typeError = error as Error;
     return NextResponse.json(
-      { message: "Token and password are required" },
-      { status: 400 }
+      {
+        statusCode: responseStatusCode.internal,
+        message: typeError.message || translations.internalError,
+      },
+      { status: responseStatusCode.internal }
     );
   }
-
-  const user = await User_Data.findOne({
-    resetPasswordToken: token,
-    resetPasswordExpires: { $gt: Date.now() },
-  });
-
-  if (!user) {
-    return NextResponse.json(
-      { message: "Invalid or expired token" },
-      { status: 400 }
-    );
-  }
-
-  user.password = await bcrypt.hash(password, 10);
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
-  await user.save();
-
-  return NextResponse.json(
-    { message: "Password reset successful" },
-    { status: 200 }
-  );
 };
